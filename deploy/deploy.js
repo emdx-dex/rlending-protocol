@@ -8,6 +8,9 @@ const chainName = (chainId) => {
       default: return 'Unknown';
     }
 }
+
+const delay = (ms) => new Promise((res) => setTimeout(res, ms));
+
 const parseEther = ethers.utils.parseEther;
 const config = {
     initialExchangeRateMantissa:  parseEther('2'),
@@ -53,13 +56,13 @@ module.exports = async (hardhat) => {
     const locus = isLocal ? 'local' : 'remote'
     console.log(`  Deploying to Network: ${chainName(chainId)} (${locus})`)
 
-    if (isLocal) { // ----------- Start if local ------------- //
+    //if (isLocal) { // ----------- Start if local ------------- //
       console.log("\n  Deploying Rif Oracle...")
       const rifOracleResult = await deploy("RifOracle", {
         args: [deployer, '150000000000000000'],
         contract: 'MockPriceProviderMoC',
         from: deployer,
-        skipIfAlreadyDeployed: true
+        skipIfAlreadyDeployed: false
       });
       rifOracle = rifOracleResult.address
 
@@ -68,7 +71,7 @@ module.exports = async (hardhat) => {
         args: [deployer, '33000000000000000000000'],
         contract: 'MockPriceProviderMoC',
         from: deployer,
-        skipIfAlreadyDeployed: true
+        skipIfAlreadyDeployed: false
       });
       rbtcOracle = rbtcOracleResult.address
 
@@ -86,7 +89,7 @@ module.exports = async (hardhat) => {
         args: [ethers.utils.parseEther('2000000'), "rif token", 18, "Rif"],
         contract: 'StandardToken',
         from: deployer,
-        skipIfAlreadyDeployed: true
+        skipIfAlreadyDeployed: false
       })
       rif = rifResult.address
 
@@ -96,19 +99,8 @@ module.exports = async (hardhat) => {
       console.log("  - Rif Oracle:       ", rifOracleResult.address)
       console.log("  - USDT:              ", usdtResult.address)
       console.log("  - Rif:              ", rifResult.address)
-    } // ----------- End if local ------------- //
+    //} // ----------- End if local ------------- //
 
-
-
-    // USDT Oracle returns always 1
-    console.log("\n 🔸 Deploying USDT Oracle...")
-    const usdtOracleResult = await deploy("USDTOracle", {
-        args: [multiSig, ethers.utils.parseEther('1')],
-        contract: 'MockPriceProviderMoC',
-        from: deployer,
-        skipIfAlreadyDeployed: true
-    });
-    usdtOracle = usdtOracleResult.address
 
     // if not set by named config
     if (!multiSig) {
@@ -127,6 +119,16 @@ module.exports = async (hardhat) => {
         multiSig,
         signer
     )
+
+    // USDT Oracle returns always 1
+    console.log("\n 🔸 Deploying USDT Oracle...")
+    const usdtOracleResult = await deploy("USDTOracle", {
+        args: [multiSig, ethers.utils.parseEther('1')],
+        contract: 'MockPriceProviderMoC',
+        from: deployer,
+        skipIfAlreadyDeployed: true
+    });
+    usdtOracle = usdtOracleResult.address
 
     console.log("\n  Deploying Unitroller...")
     const unitrollerResult = await deploy("Unitroller", {
@@ -400,6 +402,7 @@ module.exports = async (hardhat) => {
     let data = multiSigContract.interface.encodeFunctionData("changeRequirement",[2])
     //submit transacion multisig
     await multiSigContract.submitTransaction(multiSigContract.address, 0, data).then((tx) => tx.wait())
+
 
     // Display Contract Addresses
     console.log("\n  Contract Deployments Complete!\n")

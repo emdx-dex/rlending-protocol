@@ -1,8 +1,12 @@
 require("@nomiclabs/hardhat-ethers");
 require("@nomiclabs/hardhat-waffle");
+require("@nomiclabs/hardhat-etherscan");
+require("@tenderly/hardhat-tenderly");
 require("hardhat-deploy");
 
 const networks = require('./hardhat.networks')
+
+const SCAN_KEY = 'Vtw1h2HEKfs0c0Nwy3rcRAuco5EqcJzj';
 
 const config = {
   defaultNetwork: "hardhat",
@@ -27,11 +31,11 @@ const config = {
     },
     rifOracle: {
       30: '0x504efcadfb020d6bbaec8a5c5bb21453719d0e00',
-      31: '0x9d4b2c05818a0086e641437fcb64ab6098c7bbec'
+      //31: '0x9d4b2c05818a0086e641437fcb64ab6098c7bbec'
     },
     rbtcOracle: {
       30: '0x7b19bb8e6c5188ec483b784d6fb5d807a77b21bf',
-      31: '0x26a00af444928d689ddec7b4d17c0e4a8c9d407d'
+      //31: '0x26a00af444928d689ddec7b4d17c0e4a8c9d407d'
     },
     usdt: {
       30: "0xef213441a85df4d7acbdae0cf78004e1e486bb96",
@@ -39,7 +43,7 @@ const config = {
     },
     rif: {
       30: "0x2acc95758f8b5f583470ba265eb685a8f45fc9d5",
-      31: "0x19f64674d8a5b4e652319f5e239efd3bc969a1fe"
+      //31: "0x19f64674d8a5b4e652319f5e239efd3bc969a1fe"
     },
     admin1: {
       31: "0x8f63de841e7bccce39faa828128da25f8a93411f"
@@ -51,7 +55,10 @@ const config = {
       30: "0x2992181d390c5f35a70c8012a8a6a4a6b7603a37",
       31: "0x9760d4a155058f6bec8d9fd8d50222073e57083e"
     }
-  }
+  },
+  etherscan: {
+    apiKey: SCAN_KEY,
+  },
 };
 
 module.exports = config

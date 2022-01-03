@@ -15,13 +15,22 @@ const networks = {
     blockGasLimit: 68000000,
     allowUnlimitedContractSize: false,
     chainId: 33
-  }
+  },
 }
 
 if (process.env.HDWALLET_MNEMONIC) {
+  networks.fuji = {
+    url: "https://api.avax-test.network/ext/bc/C/rpc",
+    gasPrice: 95000000000,
+    allowUnlimitedContractSize: false,
+    chainId: 43113,
+    accounts: {
+      mnemonic: process.env.HDWALLET_MNEMONIC
+    }
+  },
   networks.rsktestnet = {
     url: 'https://public-node.testnet.rsk.co',
-    blockGasLimit: 6800000,
+    blockGasLimit: 68000000,
     gas: 6800000,
     allowUnlimitedContractSize: false,
     chainId: 31,
