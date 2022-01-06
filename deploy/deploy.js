@@ -11,6 +11,9 @@ const chainName = (chainId) => {
       default: return 'Unknown';
     }
 }
+
+const delay = (ms) => new Promise((res) => setTimeout(res, ms));
+
 const parseEther = ethers.utils.parseEther;
 const config = {
     initialExchangeRateMantissa:  parseEther('2'),
@@ -102,17 +105,6 @@ module.exports = async (hardhat) => {
     } // ----------- End if local ------------- //
 
 
-
-    // USDT Oracle returns always 1
-    console.log("\n 🔸 Deploying USDT Oracle...")
-    const usdtOracleResult = await deploy("USDTOracle", {
-        args: [multiSig, ethers.utils.parseEther('1')],
-        contract: 'MockPriceProviderMoC',
-        from: deployer,
-        skipIfAlreadyDeployed: true
-    });
-    usdtOracle = usdtOracleResult.address
-
     // if not set by named config
     if (!multiSig) {
         console.log("\n  Deploying MultiSigWallet...")
@@ -130,6 +122,16 @@ module.exports = async (hardhat) => {
         multiSig,
         signer
     )
+
+    // USDT Oracle returns always 1
+    console.log("\n 🔸 Deploying USDT Oracle...")
+    const usdtOracleResult = await deploy("USDTOracle", {
+        args: [multiSig, ethers.utils.parseEther('1')],
+        contract: 'MockPriceProviderMoC',
+        from: deployer,
+        skipIfAlreadyDeployed: true
+    });
+    usdtOracle = usdtOracleResult.address
 
     console.log("\n  Deploying Unitroller...")
     const unitrollerResult = await deploy("Unitroller", {
@@ -428,7 +430,7 @@ module.exports = async (hardhat) => {
         try {
             console.log('Verifiying MultiSigWallet...');
             await hre.run('verify:verify', {
-            address: multiSigResult.address,
+            address: multiSig,
             constructorArguments: [
                 [deployer, admin1, admin2], 1,
             ],

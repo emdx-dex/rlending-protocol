@@ -5,6 +5,8 @@ require("hardhat-deploy");
 
 const networks = require('./hardhat.networks')
 
+const AVAX_KEY = 'Z9HUEZXGSXXKG4Z7IADE77C6VC1YRFUAME';
+
 const config = {
   defaultNetwork: "hardhat",
   solidity: {
@@ -52,7 +54,10 @@ const config = {
       30: "0x2992181d390c5f35a70c8012a8a6a4a6b7603a37",
       31: "0x9760d4a155058f6bec8d9fd8d50222073e57083e"
     }
-  }
+  },
+  etherscan: {
+    apiKey: AVAX_KEY,
+  },
 };
 
 module.exports = config
