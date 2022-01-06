@@ -3,6 +3,9 @@ const chainName = (chainId) => {
       case 30: return 'Rsk Mainnet';
       case 31: return 'Rsk testnet';
       case 33: return 'Rsk regtest';
+      case 43113: return 'Fuji testnet';
+      case 43114: return 'Avax mainnet';
+      case 33: return 'Rsk regtest';
       case 5777: return 'Ganache';
       case 31337: return 'hardhatEVM';
       default: return 'Unknown';
@@ -400,6 +403,312 @@ module.exports = async (hardhat) => {
     let data = multiSigContract.interface.encodeFunctionData("changeRequirement",[2])
     //submit transacion multisig
     await multiSigContract.submitTransaction(multiSigContract.address, 0, data).then((tx) => tx.wait())
+
+    //------------------------- Verify Contracts if Fuji or Avax --------------------------------// 
+    if (chainId == 43113 || chainId == 43114) {
+        console.log('Waiting 2 minutes to verify contracts...');
+        await delay(0 * 60 * 1000);
+    
+        try {
+            console.log('Verifiying USDT Oracle...');
+            await hre.run('verify:verify', {
+            address: usdtOracle,
+            constructorArguments: [
+                multiSig, ethers.utils.parseEther('1'),
+            ],
+            });
+        } catch (ex) {
+            if (!ex.message.includes('Reason: Already Verified')) {
+                console.log('Error while veryfing: \n %s', ex.message);  
+            } else {
+                console.log('OK!')
+            }
+        }
+    
+        try {
+            console.log('Verifiying MultiSigWallet...');
+            await hre.run('verify:verify', {
+            address: multiSigResult.address,
+            constructorArguments: [
+                [deployer, admin1, admin2], 1,
+            ],
+            });
+        } catch (ex) {
+            if (!ex.message.includes('Reason: Already Verified')) {
+                console.log('Error while veryfing: \n %s', ex.message);  
+            } else {
+                console.log('OK!')
+            }
+        }
+    
+        try {
+            console.log('Verifiying Unitroller...');
+            await hre.run('verify:verify', {
+            address: unitrollerResult.address,
+            constructorArguments: [],
+            });
+        } catch (ex) {
+            if (!ex.message.includes('Reason: Already Verified')) {
+                console.log('Error while veryfing: \n %s', ex.message);  
+            } else {
+                console.log('OK!')
+            }
+        }
+    
+        try {
+            console.log('Verifiying PriceOracleProxy...');
+            await hre.run('verify:verify', {
+            address: priceOracleProxyResult.address,
+            constructorArguments: [deployer],
+            });
+        } catch (ex) {
+            if (!ex.message.includes('Reason: Already Verified')) {
+                console.log('Error while veryfing: \n %s', ex.message);  
+            } else {
+                console.log('OK!')
+            }
+        }
+    
+        try {
+            console.log('Verifiying RIF PriceOracleAdapter...');
+            await hre.run('verify:verify', {
+            address: rifPriceOracleAdapterResult.address,
+            constructorArguments: [multiSig, rifOracle],
+            });
+        } catch (ex) {
+            if (!ex.message.includes('Reason: Already Verified')) {
+                console.log('Error while veryfing: \n %s', ex.message);  
+            } else {
+                console.log('OK!')
+            }
+        }
+    
+        try {
+            console.log('Verifiying USDT PriceOracleAdapter...');
+            await hre.run('verify:verify', {
+            address: usdtPriceOracleAdapterResult.address,
+            constructorArguments: [multiSig, usdtOracle],
+            });
+        } catch (ex) {
+            if (!ex.message.includes('Reason: Already Verified')) {
+                console.log('Error while veryfing: \n %s', ex.message);  
+            } else {
+                console.log('OK!')
+            }
+        }
+    
+        try {
+            console.log('Verifiying RBTC PriceOracleAdapter...');
+            await hre.run('verify:verify', {
+            address: rbtcPriceOracleAdapterResult.address,
+            constructorArguments: [multiSig, rbtcOracle],
+            });
+        } catch (ex) {
+            if (!ex.message.includes('Reason: Already Verified')) {
+                console.log('Error while veryfing: \n %s', ex.message);  
+            } else {
+                console.log('OK!')
+            }
+        }
+    
+        try {
+            console.log('Verifiying Comptroller (Logic)...');
+            await hre.run('verify:verify', {
+            address: comptrollerResult.address,
+            constructorArguments: [],
+            });
+        } catch (ex) {
+            if (!ex.message.includes('Reason: Already Verified')) {
+                console.log('Error while veryfing: \n %s', ex.message);  
+            } else {
+                console.log('OK!')
+            }
+        }
+    
+        try {
+            console.log('Verifiying USDT JumpRateModelV2...');
+            await hre.run('verify:verify', {
+            address: usdtJumpRateModelV2Result.address,
+            constructorArguments: [parseEther('0'), parseEther('0.04'), parseEther('1.09'), parseEther('0.8'), multiSig],
+            });
+        } catch (ex) {
+            if (!ex.message.includes('Reason: Already Verified')) {
+                console.log('Error while veryfing: \n %s', ex.message);  
+            } else {
+                console.log('OK!')
+            }
+        }
+    
+        try {
+            console.log('Verifiying RIF JumpRateInterestRateModel...');
+            await hre.run('verify:verify', {
+            address: rifInterestRateModelResult.address,
+            constructorArguments: [parseEther('0.02'), parseEther('0.30'), parseEther('6'), parseEther('0.8'), multiSig],
+            });
+        } catch (ex) {
+            if (!ex.message.includes('Reason: Already Verified')) {
+                console.log('Error while veryfing: \n %s', ex.message);  
+            } else {
+                console.log('OK!')
+            }
+        }
+    
+        try {
+            console.log('Verifiying BTC WhitePaperInterestRateModel...');
+            await hre.run('verify:verify', {
+            address: btcWhitePaperInterestRateModelResult.address,
+            constructorArguments: [parseEther('0.02'), parseEther('0.3')],
+            });
+        } catch (ex) {
+            if (!ex.message.includes('Reason: Already Verified')) {
+                console.log('Error while veryfing: \n %s', ex.message);  
+            } else {
+                console.log('OK!')
+            }
+        }
+    
+        try {
+            console.log('Verifiying crUSDT...');
+            await hre.run('verify:verify', {
+            address: cUsdtResult.address,
+            contract: 'contracts/CErc20Immutable.sol:CErc20Immutable',
+            constructorArguments: [usdt, newUnitrollerContract.address, usdtJumpRateModelV2Result.address, config.initialExchangeRateMantissa, "rLending cUSDT", "crUSDT", 8, deployer],
+            });
+        } catch (ex) {
+            if (!ex.message.includes('Reason: Already Verified')) {
+                console.log('Error while veryfing: \n %s', ex.message);  
+            } else {
+                console.log('OK!')
+            }
+        }
+    
+        try {
+            console.log('Verifiying cRIF...');
+            await hre.run('verify:verify', {
+            address: cRifResult.address,
+            contract: 'contracts/CErc20Immutable.sol:CErc20Immutable',
+            constructorArguments: [rif, newUnitrollerContract.address, rifInterestRateModelResult.address, config.initialExchangeRateMantissa, "rLending RIF", "cRIF", 8, deployer],
+            });
+        } catch (ex) {
+            if (!ex.message.includes('Reason: Already Verified')) {
+                console.log('Error while veryfing: \n %s', ex.message);  
+            } else {
+                console.log('OK!')
+            }
+        }
+    
+        try {
+            console.log('Verifiying cRBTC...');
+            await hre.run('verify:verify', {
+            address: cRbtcResult.address,
+            constructorArguments: [newUnitrollerContract.address, btcWhitePaperInterestRateModelResult.address, config.initialExchangeRateMantissa, "rLending RBTC", "cRBTC", 8, deployer],
+            });
+        } catch (ex) {
+            if (!ex.message.includes('Reason: Already Verified')) {
+                console.log('Error while veryfing: \n %s', ex.message);  
+            } else {
+                console.log('OK!')
+            }
+        }
+    
+        try {
+            console.log('Verifiying RLEN...');
+            await hre.run('verify:verify', {
+            address: rLenResult.address,
+            constructorArguments: [multiSig],
+            });
+        } catch (ex) {
+            if (!ex.message.includes('Reason: Already Verified')) {
+                console.log('Error while veryfing: \n %s', ex.message);  
+            } else {
+                console.log('OK!')
+            }
+        }
+    
+        try {
+            console.log('Verifiying Maximillion...');
+            await hre.run('verify:verify', {
+            address: maximillionResult.address,
+            constructorArguments: [cRbtcResult.address],
+            });
+        } catch (ex) {
+            if (!ex.message.includes('Reason: Already Verified')) {
+                console.log('Error while veryfing: \n %s', ex.message);  
+            } else {
+                console.log('OK!')
+            }
+        }
+    
+        try {
+            console.log('Verifiying rLendingLens...');
+            await hre.run('verify:verify', {
+            address: rLedingLensResult.address,
+            constructorArguments: [],
+            });
+        } catch (ex) {
+            if (!ex.message.includes('Reason: Already Verified')) {
+                console.log('Error while veryfing: \n %s', ex.message);  
+            } else {
+                console.log('OK!')
+            }
+        }
+    
+        try {
+            console.log('Verifiying Rbtc Oracle...');
+            await hre.run('verify:verify', {
+            address: rbtcOracle,
+            constructorArguments: [deployer, '33000000000000000000000'],
+            });
+        } catch (ex) {
+            if (!ex.message.includes('Reason: Already Verified')) {
+                console.log('Error while veryfing: \n %s', ex.message);  
+            } else {
+                console.log('OK!')
+            }
+        }
+    
+        try {
+            console.log('Verifiying Rif Oracle...');
+            await hre.run('verify:verify', {
+            address: rifOracle,
+            constructorArguments: [deployer, '150000000000000000'],
+            });
+        } catch (ex) {
+            if (!ex.message.includes('Reason: Already Verified')) {
+                console.log('Error while veryfing: \n %s', ex.message);  
+            } else {
+                console.log('OK!')
+            }
+        }
+    
+        try {
+            console.log('Verifiying rUSDT...');
+            await hre.run('verify:verify', {
+            address: usdt,
+            constructorArguments: [ethers.utils.parseEther('2000000'), "USDT token", 18, "rUSDT"],
+            });
+        } catch (ex) {
+            if (!ex.message.includes('Reason: Already Verified')) {
+                console.log('Error while veryfing: \n %s', ex.message);  
+            } else {
+                console.log('OK!')
+            }
+        }
+    
+        try {
+            await hre.run('verify:verify', {
+            address: rif,
+            constructorArguments: [ethers.utils.parseEther('2000000'), "rif token", 18, "Rif"],
+            });
+        } catch (ex) {
+            if (!ex.message.includes('Reason: Already Verified')) {
+                console.log('Error while veryfing: \n %s', ex);  
+            } else {
+                console.log('OK!')
+            }
+        }
+
+    }
 
     // Display Contract Addresses
     console.log("\n  Contract Deployments Complete!\n")

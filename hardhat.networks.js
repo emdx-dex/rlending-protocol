@@ -39,6 +39,26 @@ if (process.env.HDWALLET_MNEMONIC) {
       mnemonic: process.env.HDWALLET_MNEMONIC
     }
   }
+  networks.avaxfuji = {
+    url: 'https://api.avax-test.network/ext/bc/C/rpc',
+    blockGasLimit: 25000000000,
+    gas: 25000000000,
+    allowUnlimitedContractSize: false,
+    chainId: 43113,
+    accounts: {
+      mnemonic: process.env.HDWALLET_MNEMONIC
+    }
+  }
+  networks.avaxmainnet = {
+    url: 'https://api.avax.network/ext/bc/C/rpc',
+    blockGasLimit: 25000000000,
+    gas: 25000000000,
+    allowUnlimitedContractSize: false,
+    chainId: 43114,
+    accounts: {
+      mnemonic: process.env.HDWALLET_MNEMONIC
+    }
+  }
 } else {
   console.warn('No hdwallet available for testnet and mainnet')
 }
